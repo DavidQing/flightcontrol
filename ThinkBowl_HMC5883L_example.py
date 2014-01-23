@@ -1,20 +1,20 @@
 from ThinkBowl_HMC5883L import HMC5883L
 
-comp = HMC5883L(0x1e)
+compass = HMC5883L(0x1e)
 
-hmc5883l.setContinuousMode()
-hmc5883l.setDeclination(9,54)
+compass.setContinuousMode()
+compass.setDeclination(9,54)
 
 # To get degrees and minutes into variables
-(degrees, minutes) = hmc5883l.getDeclination()
-(degress, minutes) = hmc5883l.getHeading()
+(degrees, minutes) = compass.getDeclination()
+(degress, minutes) = compass.getHeading()
 
 # To get string of degrees and minutes
-declination = hmc5883l.getDeclinationString()
-heading = hmc5883l.getHeadingString()
+declination = compass.getDeclinationString()
+heading = compass.getHeadingString()
 
 # To scaled axes
-(x, y, z) = hmc5883l.getAxes()
+(x, y, z) = compass.getAxes()
 
 print("X:    "+str(x))
 print("Y:    "+str(y))
