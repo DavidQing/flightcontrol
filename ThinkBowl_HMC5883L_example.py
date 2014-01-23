@@ -15,3 +15,8 @@ heading = hmc5883l.getHeadingString()
 
 # To scaled axes
 (x, y, z) = hmc5883l.getAxes()
+
+print("X:    "+str(x))
+print("Y:    "+str(y))
+print("Z:    "+str(z))
+print("")
