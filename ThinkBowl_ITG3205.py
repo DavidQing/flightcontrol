@@ -58,6 +58,12 @@ class ITG3205:
 		self.setSampleRateDivider(0x07)
 		self.setDLPFAndFullScale(self.FullScale_2000_sec, self.DLPF_188_1)
 		self.setInterrupt(self.IC_LatchUntilIntCleared, self.IC_IntOnDeviceReady, self.IC_IntOnDataReady)
+
+	def readS16(self, register):
+    		"Reads a signed 16-bit value"
+    		hi = self.bus.readS8(register)
+    		lo = self.bus.readU8(register+1)
+    		return (hi << 8) + lo
 	
 	def setPowerManagement(self, *function_set):
 		self.setOption(self.PowerManagement, *function_set)
@@ -101,9 +107,9 @@ class ITG3205:
 		return options
 		
 	def getAxes(self):
-		gyro_x = self.bus.readS16(self.GyroXDataRegisterMSB)
-		gyro_y = self.bus.readS16(self.GyroYDataRegisterMSB)
-		gyro_z = self.bus.readS16(self.GyroZDataRegisterMSB)
+		gyro_x = self.readS16(self.GyroXDataRegisterMSB)
+		gyro_y = self.readS16(self.GyroYDataRegisterMSB)
+		gyro_z = self.readS16(self.GyroZDataRegisterMSB)
 		return (gyro_x, gyro_y, gyro_z)
 	
 	def getDegPerSecAxes(self):
