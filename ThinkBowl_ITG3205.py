@@ -51,7 +51,7 @@ class ITG3205:
 	IC_IntOnDataReady = 0x01
 	
 	# Address will always be either 0x68 (104) or 0x69 (105)
-	def __init__(self, port, addr=0x68):
+	def __init__(self, addr=0x68):
 		self.bus = Adafruit_I2C(addr)
 		
 		self.setPowerManagement(0x00)
