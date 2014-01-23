@@ -18,6 +18,10 @@ class ITG3205:
 	GyroZDataRegisterMSB = 0x21
 	GyroZDataRegisterLSB = 0x22
 	PowerManagement = 0x3E
+
+	GYRO_OFFSETX = 7
+	GYRO_OFFSETY = 39
+	GYRO_OFFSETZ = 0
 	
 	# DLPF, Full Scale Setting
 	FullScale_2000_sec = 0x18 # must be set at reset
@@ -107,11 +111,15 @@ class ITG3205:
 		return options
 		
 	def getAxes(self):
-		gyro_x = self.readS16(self.GyroXDataRegisterMSB)
-		gyro_y = self.readS16(self.GyroYDataRegisterMSB)
-		gyro_z = self.readS16(self.GyroZDataRegisterMSB)
+		gyro_x = self.readS16(self.GyroXDataRegisterMSB) - self.GYRO_OFFSETX
+		gyro_y = self.readS16(self.GyroYDataRegisterMSB) - self.GYRO_OFFSETY
+		gyro_z = self.readS16(self.GyroZDataRegisterMSB) - self.GYRO_OFFSETZ
 		return (gyro_x, gyro_y, gyro_z)
 	
 	def getDegPerSecAxes(self):
 		(gyro_x, gyro_y, gyro_z) = self.getAxes()
 		return (gyro_x / 14.375, gyro_y / 14.375, gyro_z / 14.375)
+
+	def getRadPerSecAxes(self):
+		(gyro_x, gyro_y, gyro_z) = self.getAxes()
+		return ((gyro_x*math.pi)/(14.375*180), (gyro_y*math.pi)/(14.375*180), (gyro_z*math.pi)/(14.375*180))
