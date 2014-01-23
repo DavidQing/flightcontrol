@@ -104,10 +104,10 @@ class ADXL345:
 		self.setFreeFallTime()
 	
 	def readS16(self, register):
-        "Reads a signed 16-bit value"
-        hi = self.bus.readS8(register+1)
-        lo = self.bus.readU8(register)
-        return (hi << 8) + lo
+        	"Reads a signed 16-bit value"
+        	hi = self.bus.readS8(register+1)
+        	lo = self.bus.readU8(register)
+        	return (hi << 8) + lo
 		
 	def __str__(self):
 		ret_str = ""
