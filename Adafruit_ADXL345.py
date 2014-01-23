@@ -32,10 +32,18 @@ class ADXL345:
     ADXL345_ADDRESS          = 0x53
 
     ADXL345_REG_DEVID        = 0x00 # Device ID
+    ADXL345_REG_DATA_FORMAT  = 0x31
     ADXL345_REG_DATAX0       = 0x32 # X-axis data 0 (6 bytes for X/Y/Z)
     ADXL345_REG_DATAY0       = 0x34
     ADXL345_REG_DATAZ0       = 0x36
     ADXL345_REG_POWER_CTL    = 0x2D # Power-saving features control
+
+    ACCELEROMETER_GAIN       = 0.004 
+    GRAVITY                  = 9.813
+
+    ADXL345_OFFSETX          = 0
+    ADXL345_OFFSETY          = 17
+    ADXL345_OFFSETZ          = 20
 
     ADXL345_DATARATE_0_10_HZ = 0x00
     ADXL345_DATARATE_0_20_HZ = 0x01
@@ -65,6 +73,8 @@ class ADXL345:
         self.accel = Adafruit_I2C(self.ADXL345_ADDRESS, busnum, debug)
 
         if self.accel.readU8(self.ADXL345_REG_DEVID) == 0xE5:
+	    # Full resolution, +/-16g, 4mg/LSB.
+	    self.accel.write8(self.ADXL345_REG_DATA_FORMAT, 0x0B)
             # Enable the accelerometer
             self.accel.write8(self.ADXL345_REG_POWER_CTL, 0x08)
 
@@ -96,12 +106,30 @@ class ADXL345:
     def getDataRate(self):
         return self.accel.readU8(self.ADXL345_REG_BW_RATE) & 0x0F
 
+    def readRaw(self):
+	accel_x = self.readS16(self.ADXL345_RED_DATAX0)
+	accel_y = self.readS16(self.ADXL345_RED_DATAY0)
+	accel_z = self.readS16(self.ADXL345_RED_DATAZ0)
+	return (accel_x, acel_y, accel_z)
+
 
     # Read the accelerometer
     def read(self):
-        accel_x = self.readS16(self.ADXL345_REG_DATAX0) 
-        accel_y = self.readS16(self.ADXL345_REG_DATAY0)
-        accel_z = self.readS16(self.ADXL345_REG_DATAZ0)
+        accel_x = (self.readS16(self.ADXL345_REG_DATAX0) + self.ADXL345_OFFSETX) * self.ACCELEROMETER_GAIN
+        accel_y = (self.readS16(self.ADXL345_REG_DATAY0) + self.ADXL345_OFFSETY) * self.ACCELEROMETER_GAIN
+        accel_z = (self.readS16(self.ADXL345_REG_DATAZ0) + self.ADXL345_OFFSETZ) * self.ACCELEROMETER_GAIN
         return (accel_x, accel_y, accel_z)
 
 
+    def getEulerAngles(self, fax, fay, faz):
+        #---------------------------------------------------------------------------
+        # What's the angle in the x and y plane from horizontal in radians?
+        # Note fax, fay, fax are all the calibrated outputs reading 0, 0, 0 on
+        # horizontal ground as a measure of speed in a given direction.  For Euler we
+        # need to re-add gravity of 1g so the sensors read 0, 0, 1 for a horizontal setting
+        #---------------------------------------------------------------------------
+        pitch = -math.atan2(fax, faz)
+        roll = math.atan2(fay,  faz)
+        tilt = math.atan2(faz, math.pow(math.pow(fax, 2) + math.pow(fay, 2), 0.5))
+
+        return pitch, roll, tilt
