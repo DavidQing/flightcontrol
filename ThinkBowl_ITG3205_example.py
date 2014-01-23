@@ -7,7 +7,7 @@ while True:
 	(itgready, dataready) = gyro.getInterruptStatus()	
 	if dataready:
 		#temp = gyro.getDieTemperature()
-		(x, y, z) = gyro.getDegPerSecAxes() 
+		(x, y, z) = gyro.getRadPerSecAxes() 
 		#print("Temp: "+str(temp))
 		print("X:    "+str(x))
 		print("Y:    "+str(y))
