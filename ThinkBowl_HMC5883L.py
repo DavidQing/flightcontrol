@@ -1,8 +1,8 @@
 import math
-from i2clibraries import i2c
+from Adafruit_I2C import Adafruit_I2C
 from time import *
 
-class i2c_hmc5883l:
+class HMC5883L:
 	
 	ConfigurationRegisterA = 0x00
 	ConfigurationRegisterB = 0x01
@@ -23,10 +23,16 @@ class i2c_hmc5883l:
 	MeasurementSingleShot = 0x01
 	MeasurementIdle = 0x03
 	
-	def __init__(self, port, addr=0x1e, gauss=1.3):
-		self.bus = i2c.i2c(port, addr)
+	def __init__(self, addr=0x1e, gauss=1.3):
+		self.bus = Adafruit_I2C(addr)
 		
 		self.setScale(gauss)
+	
+	def readS16(self, register):
+                "Reads a signed 16-bit value"
+                hi = self.bus.readS8(register)
+                lo = self.bus.readU8(register+1)
+                return (hi << 8) + lo
 		
 	def __str__(self):
 		ret_str = ""
@@ -84,7 +90,7 @@ class i2c_hmc5883l:
 		options = 0x00
 		for function in function_set:
 			options = options | function
-		self.bus.write_byte(register, options)
+		self.bus.write8(register, options)
 		
 	def getDeclination(self):
 		return (self.declinationDeg, self.declinationMin)
@@ -118,7 +124,9 @@ class i2c_hmc5883l:
 		return str(degrees)+"\u00b0 "+str(minutes)+"'"
 		
 	def getAxes(self):
-		(magno_x, magno_z, magno_y) = self.bus.read_3s16int(self.AxisXDataRegisterMSB)
+		magno_x = self.readS16(self.AxisXDataRegisterMSB)
+		magno_y = self.readS16(self.AxisYDataRegisterMSB)
+		magno_z = self.readS16(self.AxisZDataRegisterMSB)
 
 		if (magno_x == -4096):
 			magno_x = None
