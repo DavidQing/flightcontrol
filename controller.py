@@ -152,7 +152,6 @@ PWM.start("P9_42", motor4, 400, 0)
   
   
     #Update each motor with new speed
-    
     PWM.set_duty_cycle("P9_14", motor1)
     PWM.set_duty_cycle("P8_13", motor2)
     PWM.set_duty_cycle("P9_21", motor3)
