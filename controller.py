@@ -27,6 +27,9 @@ import shutil
 import ctypes
 from ctypes.util import find_library
 
+def map (x, in_min, in_max, out_min, out_max)
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
 ############################################################################################
 # PID algorithm to take input accelerometer readings, and target accelermeter requirements, and
 # as a result feedback new rotor speeds.
@@ -112,11 +115,17 @@ gyro = ITG3205(0x68)
 compass = HMC5883L(0x1e)
 bmp = BMP085(0x77)
 
+#declare RC receiver values (1000-2000us)
+rcthr = 0.0
+rcyaw = 0.0
+rcpitch = 0.0
+rcroll = 0.0
+
 #initial motor values, 400Hz, 1us-2us, 40%-80%
-motor1 = 0.0    #Front Left (CW)    (+roll,+pitch,-yaw)
-motor2 = 0.0    #Front Right (CCW)  (-roll,+pitch,+yaw)
-motor3 = 0.0    #Back Right (CW)    (-roll,-pitch,-yaw)
-motor4 = 0.0    #Back Left (CCW)    (+roll,-pitch,-yaw)
+motor1 = 0.0    #Front Left (CW)    (-roll,-pitch,-yaw)
+motor2 = 0.0    #Front Right (CCW)  (+roll,-pitch,+yaw)
+motor3 = 0.0    #Back Right (CW)    (+roll,+pitch,-yaw)
+motor4 = 0.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
 
 PWM.start("P9_14", motor1, 400, 0)
 PWM.start("P8_13", motor2, 400, 0)
@@ -127,11 +136,14 @@ PWM.start("P9_42", motor4, 400, 0)
 
 #While Loop
 
+    #read RC receiver values from PRU
+    
+
     #Read Gyro and Accelerometer Data
     ax, ay, az = accel.read()
     gx, gy, gz = gyro.getRadPerSecAxes()
     
-    epitch, eroll, eyaw = getEulerAngles(ax, ay, az)
+    epitch, eroll, eyaw = accel.getEulerAngles(ax, ay, az)
     
     mx, my, mz = compass.getAxes()
     
@@ -141,16 +153,18 @@ PWM.start("P9_42", motor4, 400, 0)
 
 
 
-    #Calculate PID of each axis
+    #Calculate PID stab and rate of each axis, 6 total
 
-
-
+    pitchout = 
+    rollout = 
+    yawout = 
 
     #Combine user input values and PID outputs to obtain individual motor speed
-  
-  
-  
-  
+    motor1 = map(rcthr - rollout - pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor2 = map(rcthr + rollout - pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor3 = map(rcthr + rollout + pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor4 = map(rcthr - rollout + pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
+    
     #Update each motor with new speed
     PWM.set_duty_cycle("P9_14", motor1)
     PWM.set_duty_cycle("P8_13", motor2)
