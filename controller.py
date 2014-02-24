@@ -33,7 +33,7 @@ from ctypes.util import find_library
 ############################################################################################
 class PID:
 
-        def __init__(self, p_gain, i_gain, d_gain):
+        def __init__(self, p_gain, i_gain, d_gain=0):
                 self.last_error = 0.0
                 self.last_time = time.time()
                 self.p_gain = p_gain
@@ -106,42 +106,65 @@ class PID:
 #
 ############################################################################################
 
-motor1 = 0    #Front Left (CW)    (+roll,+pitch,-yaw)
-motor2 = 0    #Front Right (CCW)  (-roll,+pitch,+yaw)
-motor3 = 0    #Back Right (CW)    (-roll,-pitch,-yaw)
-motor4 = 0    #Back Left (CCW)    (+roll,-pitch,-yaw)
+#initilize the sensors
+accel = ADXL345(0x53)
+gyro = ITG3205(0x68)
+compass = HMC5883L(0x1e)
+bmp = BMP085(0x77)
+
+#initial motor values, 400Hz, 1us-2us, 40%-80%
+motor1 = 0.0    #Front Left (CW)    (+roll,+pitch,-yaw)
+motor2 = 0.0    #Front Right (CCW)  (-roll,+pitch,+yaw)
+motor3 = 0.0    #Back Right (CW)    (-roll,-pitch,-yaw)
+motor4 = 0.0    #Back Left (CCW)    (+roll,-pitch,-yaw)
+
+PWM.start("P9_14", motor1, 400, 0)
+PWM.start("P8_13", motor2, 400, 0)
+PWM.start("P9_21", motor3, 400, 0)
+PWM.start("P9_42", motor4, 400, 0)
 
 #initialize output pins
 
 #While Loop
 
-  #Read Gyro and Accelerometer Data
+    #Read Gyro and Accelerometer Data
+    ax, ay, az = accel.read()
+    gx, gy, gz = gyro.getRadPerSecAxes()
+    
+    epitch, eroll, eyaw = getEulerAngles(ax, ay, az)
+    
+    mx, my, mz = compass.getAxes()
+    
+    #Calculate accurate data with complementary filter
 
 
 
 
 
-  #Calculate accurate data with complementary filter
+    #Calculate PID of each axis
 
 
 
 
-
-  #Calculate PID of each axis
-
-
-
-
-  #Combine user input values and PID outputs to obtain individual motor speed
+    #Combine user input values and PID outputs to obtain individual motor speed
   
   
   
   
-  #Update each motor with new speed
+    #Update each motor with new speed
+    
+    PWM.set_duty_cycle("P9_14", motor1)
+    PWM.set_duty_cycle("P8_13", motor2)
+    PWM.set_duty_cycle("P9_21", motor3)
+    PWM.set_duty_cycle("P9_42", motor4)
   
   
 #Exit and shut down everything
-
+PWM.stop("P9_14")
+PWM.stop("P8_13")
+PWM.stop("P9_21")
+PWM.stop("P9_42")
+PWM.cleanup()
 
 
 
