@@ -68,9 +68,9 @@ class ADXL345:
     ADXL345_RANGE_16_G       = 0x03 # +/- 16g
 
 
-    def __init__(self, busnum=-1, debug=False):
+    def __init__(self,address=0x53, busnum=-1, debug=False):
 
-        self.accel = Adafruit_I2C(self.ADXL345_ADDRESS, busnum, debug)
+        self.accel = Adafruit_I2C(self.address, busnum, debug)
 
         if self.accel.readU8(self.ADXL345_REG_DEVID) == 0xE5:
 	    # Full resolution, +/-16g, 4mg/LSB.
