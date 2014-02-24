@@ -135,10 +135,15 @@ motor4 = 0    #Back Left (CCW)    (+roll,-pitch,-yaw)
   #Combine user input values and PID outputs to obtain individual motor speed
   
   
+  
+  
+  #Update each motor with new speed
+  
+  
 #Exit and shut down everything
 
 
 
 
 
-#Update each motor with new speed
+
