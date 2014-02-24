@@ -1,7 +1,7 @@
 import time
 from Adafruit_ADXL345 import ADXL345
 
-accel = ADXL345()
+accel = ADXL345(0x53)
 
 print '[Accelerometer X, Y, Z]'
 print accel.read()
