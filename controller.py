@@ -122,15 +122,17 @@ rcpitch = 0.0
 rcroll = 0.0
 
 #initial motor values, 400Hz, 1us-2us, 40%-80%
-motor1 = 0.0    #Front Left (CW)    (-roll,-pitch,-yaw)
-motor2 = 0.0    #Front Right (CCW)  (+roll,-pitch,+yaw)
-motor3 = 0.0    #Back Right (CW)    (+roll,+pitch,-yaw)
-motor4 = 0.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
+motor1 = 40.0    #Front Left (CW)    (-roll,-pitch,-yaw)
+motor2 = 40.0    #Front Right (CCW)  (+roll,-pitch,+yaw)
+motor3 = 40.0    #Back Right (CW)    (+roll,+pitch,-yaw)
+motor4 = 40.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
 
 PWM.start("P9_14", motor1, 400, 0)
 PWM.start("P9_21", motor2, 400, 0)
 PWM.start("P9_42", motor3, 400, 0)
 PWM.start("P8_13", motor4, 400, 0)
+
+time.sleep(3)    #wait 3s for ESC to start, keep at minimum thro
 
 #initialize output pins
 
