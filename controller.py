@@ -128,9 +128,9 @@ motor3 = 0.0    #Back Right (CW)    (+roll,+pitch,-yaw)
 motor4 = 0.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
 
 PWM.start("P9_14", motor1, 400, 0)
-PWM.start("P8_13", motor2, 400, 0)
-PWM.start("P9_21", motor3, 400, 0)
-PWM.start("P9_42", motor4, 400, 0)
+PWM.start("P9_21", motor2, 400, 0)
+PWM.start("P9_42", motor3, 400, 0)
+PWM.start("P8_13", motor4, 400, 0)
 
 #initialize output pins
 
@@ -167,9 +167,9 @@ PWM.start("P9_42", motor4, 400, 0)
     
     #Update each motor with new speed
     PWM.set_duty_cycle("P9_14", motor1)
-    PWM.set_duty_cycle("P8_13", motor2)
-    PWM.set_duty_cycle("P9_21", motor3)
-    PWM.set_duty_cycle("P9_42", motor4)
+    PWM.set_duty_cycle("P9_21", motor2)
+    PWM.set_duty_cycle("P9_42", motor3)
+    PWM.set_duty_cycle("P8_13", motor4)
   
   
 #Exit and shut down everything
