@@ -107,9 +107,9 @@ class ADXL345:
         return self.accel.readU8(self.ADXL345_REG_BW_RATE) & 0x0F
 
     def readRaw(self):
-	accel_x = self.readS16(self.ADXL345_RED_DATAX0)
-	accel_y = self.readS16(self.ADXL345_RED_DATAY0)
-	accel_z = self.readS16(self.ADXL345_RED_DATAZ0)
+	accel_x = self.readS16(self.ADXL345_REG_DATAX0)
+	accel_y = self.readS16(self.ADXL345_REG_DATAY0)
+	accel_z = self.readS16(self.ADXL345_REG_DATAZ0)
 	return (accel_x, acel_y, accel_z)
 
 
