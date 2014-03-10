@@ -29,6 +29,9 @@ from ctypes.util import find_library
 
 def map (x, in_min, in_max, out_min, out_max)
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    
+def todeg (x)
+    return x*(180/math.pi)
 
 ############################################################################################
 # PID algorithm to take input accelerometer readings, and target accelermeter requirements, and
@@ -101,7 +104,7 @@ class PID:
                 #---------------------------------------------------------------------------
                 # Return the output, which has been tuned to be the increment / decrement in ESC PWM
                 #---------------------------------------------------------------------------
-                return p_output, i_output, d_output
+                return p_output + i_output + d_output
                 
 ############################################################################################
 #
@@ -114,6 +117,11 @@ accel = ADXL345(0x53)
 gyro = ITG3205(0x68)
 compass = HMC5883L(0x1e)
 bmp = BMP085(0x77)
+
+#assume quad start at level
+i_pitch = 0
+i_roll = 0
+i_yaw = 0
 
 #declare RC receiver values (1000-2000us)
 rcthr = 0.0
@@ -169,9 +177,13 @@ while True:
     
     #Read Gyro and Accelerometer Data
     ax, ay, az = accel.read()
-    gx, gy, gz = gyro.getRadPerSecAxes()
+    gx, gy, gz = gyro.getDegPerSecAxes()
     
     epitch, eroll, eyaw = accel.getEulerAngles(ax, ay, az)
+    
+    epitch = todeg(epitch)
+    eroll = todeg(eroll)
+    eyaw = todeg(eyaw)
     
     mx, my, mz = compass.getAxes()
     
@@ -179,9 +191,10 @@ while True:
     i_pitch += gy * delta_time
     i_roll += gx * delta_time
     i_yaw += gz * delta_time
-
-
-
+    
+    pitch = 0.9*i_pitch + 0.1*epitch
+    roll = 0.9*i_roll + 0.1*eroll
+    yaw = 0.9*i_roll + 0.1*mz
 
     #Calculate PID stab and rate of each axis, 6 total
 
