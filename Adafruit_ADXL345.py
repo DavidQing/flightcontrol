@@ -41,9 +41,9 @@ class ADXL345:
     ACCELEROMETER_GAIN       = 0.004 
     GRAVITY                  = 9.813
 
-    ADXL345_OFFSETX          = 0
-    ADXL345_OFFSETY          = 17
-    ADXL345_OFFSETZ          = 20
+    ADXL345_OFFSETX          = 0    # set by user
+    ADXL345_OFFSETY          = 0
+    ADXL345_OFFSETZ          = 0
 
     ADXL345_DATARATE_0_10_HZ = 0x00
     ADXL345_DATARATE_0_20_HZ = 0x01
