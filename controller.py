@@ -197,10 +197,13 @@ while True:
     yaw = 0.9*i_roll + 0.1*mz
 
     #Calculate PID stab and rate of each axis, 6 total
+    pitchstab = ps_pid.Compute(pitch, rcpitch)
+    rollstab = rs_pid.Coompute(roll, rcroll)
+    yawstab = ys_pid.Compute(yaw, rcyaw)
 
-    pitchout = 
-    rollout = 
-    yawout = 
+    pitchout = pr_pid.Compute(gx, pitchstab)
+    rollout = rr_pid.Compute(gy, rollstab)
+    yawout = yr_pid.Compute(gz, yawstab)
 
     #Combine user input values and PID outputs to obtain individual motor speed
     motor1 = map(rcthr - rollout - pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
