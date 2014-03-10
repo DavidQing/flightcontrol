@@ -36,7 +36,7 @@ def map (x, in_min, in_max, out_min, out_max)
 ############################################################################################
 class PID:
 
-        def __init__(self, p_gain, i_gain, d_gain=0):
+        def __init__(self, p_gain, i_gain, d_gain):
                 self.last_error = 0.0
                 self.last_time = time.time()
                 self.p_gain = p_gain
@@ -121,12 +121,22 @@ rcyaw = 0.0
 rcpitch = 0.0
 rcroll = 0.0
 
+#initialize PIDs (Pgain, Igain, Dgain)
+ps_pid = PID(4.5, 0, 0)
+rs_pid = PID(4.5, 0, 0)
+ys_pid = PID(10, 0, 0)
+
+pr_pid = PID(0.7, 0, 0)
+rr_pid = PID(0.7, 0, 0)
+yr_pid = PID(2.7, 0, 0)
+
 #initial motor values, 400Hz, 1us-2us, 40%-80%
 motor1 = 40.0    #Front Left (CW)    (-roll,-pitch,-yaw)
 motor2 = 40.0    #Front Right (CCW)  (+roll,-pitch,+yaw)
 motor3 = 40.0    #Back Right (CW)    (+roll,+pitch,-yaw)
 motor4 = 40.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
 
+#initialize output pins
 PWM.start("P9_14", motor1, 400, 0)
 PWM.start("P9_21", motor2, 400, 0)
 PWM.start("P9_42", motor3, 400, 0)
@@ -134,13 +144,29 @@ PWM.start("P8_13", motor4, 400, 0)
 
 time.sleep(3)    #wait 3s for ESC to start, keep at minimum thro
 
-#initialize output pins
+#keep track of time
+elapsed_time = 0.0
+start_time = time.time()
+current_time = start_time
+prev_sample_time = current_time
 
 #While Loop
+while True:
+    #update time
+    current_time = time.time()
+	delta_time = current_time - start_time - elapsed_time
+	elapsed_time = current_time - start_time
 
     #read RC receiver values from PRU
-    
+    rcthr = 0.0
+    rcpitch = 0.0
+    rcroll = 0.0
+    rcyaw = 0.0
 
+    rcpitch = map(rcpitch, 1000, 2000, -45, 45)
+    rcroll = map(rcroll, 1000, 2000, -45, 45)
+    rcyaw = map(rcyaw, 1000, 2000, -180, 180)
+    
     #Read Gyro and Accelerometer Data
     ax, ay, az = accel.read()
     gx, gy, gz = gyro.getRadPerSecAxes()
@@ -150,7 +176,9 @@ time.sleep(3)    #wait 3s for ESC to start, keep at minimum thro
     mx, my, mz = compass.getAxes()
     
     #Calculate accurate data with complementary filter
-
+    i_pitch += gy * delta_time
+	i_roll += gx * delta_time
+	i_yaw += gz * delta_time
 
 
 
