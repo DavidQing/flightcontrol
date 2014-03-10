@@ -154,8 +154,8 @@ prev_sample_time = current_time
 while True:
     #update time
     current_time = time.time()
-	delta_time = current_time - start_time - elapsed_time
-	elapsed_time = current_time - start_time
+    delta_time = current_time - start_time - elapsed_time
+    elapsed_time = current_time - start_time
 
     #read RC receiver values from PRU
     rcthr = 0.0
@@ -177,8 +177,8 @@ while True:
     
     #Calculate accurate data with complementary filter
     i_pitch += gy * delta_time
-	i_roll += gx * delta_time
-	i_yaw += gz * delta_time
+    i_roll += gx * delta_time
+    i_yaw += gz * delta_time
 
 
 
