@@ -156,7 +156,6 @@ time.sleep(3)    #wait 3s for ESC to start, keep at minimum thro
 elapsed_time = 0.0
 start_time = time.time()
 current_time = start_time
-prev_sample_time = current_time
 
 #While Loop
 while True:
