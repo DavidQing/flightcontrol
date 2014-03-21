@@ -197,7 +197,7 @@ while True:
 
     #Calculate PID stab and rate of each axis, 6 total
     pitchstab = ps_pid.Compute(pitch, rcpitch)
-    rollstab = rs_pid.Coompute(roll, rcroll)
+    rollstab = rs_pid.Compute(roll, rcroll)
     yawstab = ys_pid.Compute(yaw, rcyaw)
 
     pitchout = pr_pid.Compute(gx, pitchstab)
