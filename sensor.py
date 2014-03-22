@@ -47,8 +47,8 @@ compass = HMC5883L(0x1e)
 bmp = BMP085(0x77)
 
 #assume quad start at level
-i_pitch = 0
-i_roll = 0
+#i_pitch = 0
+#i_roll = 0
 i_yaw = 0
 
 
@@ -64,13 +64,12 @@ while True:
     delta_time = current_time - start_time - elapsed_time
     elapsed_time = current_time - start_time
 
-
     #Read Gyro and Accelerometer Data
     ax, ay, az = accel.read()
     gx, gy, gz = gyro.getDegPerSecAxes()
 
-    print("Ax: "+str(ax)+", Ay: "+str(ay)+", Az: "+str(az)) #debug
-    print("Gx: "+str(gx)+", Gy: "+str(gy)+", Gz: "+str(gz)) #debug
+    #print("Ax: "+str(ax)+", Ay: "+str(ay)+", Az: "+str(az)) #debug
+    #print("Gx: "+str(gx)+", Gy: "+str(gy)+", Gz: "+str(gz)) #debug
     
     epitch, eroll, eyaw = accel.getEulerAngles(ax, ay, az)
     
@@ -81,17 +80,19 @@ while True:
     print("epitch: "+str(epitch)+", eroll: "+str(eroll)+", eyaw: "+str(eyaw)) #debug
     
     #Calculate accurate data with complementary filter
-    i_pitch += gy * delta_time
-    i_roll += gx * delta_time
-    i_yaw += gz * delta_time
+    #i_pitch = round(i_pitch + (gy*delta_time),1)
+    #i_roll = round(i_roll + (gx*delta_time),1)
+    i_yaw = round(i_yaw + (gz*delta_time),1)
+
+    #print("i_pitch: "+str(i_pitch)+", i_roll: "+str(i_roll)+", i_yaw: "+str(i_yaw)) #debug
     
-    pitch = 0.9*i_pitch + 0.1*epitch
-    roll = 0.9*i_roll + 0.1*eroll
+    pitch = round(epitch,1)
+    roll = round(eroll,1)
     yaw = i_yaw
 
     print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
 
-    time.sleep(1) #debug
+    time.sleep(0.1) #debug
   
   
 #Exit and shut down everything
