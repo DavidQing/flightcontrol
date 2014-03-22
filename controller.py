@@ -32,6 +32,14 @@ def map(x, in_min, in_max, out_min, out_max):
     
 def todeg(x):
     return x*(180/math.pi)
+    
+def constrain(n, minn, maxn):
+    if n < minn:
+        return minn
+    elif n > maxn:
+        return maxn
+    else:
+        return n
 
 ############################################################################################
 # PID algorithm to take input accelerometer readings, and target accelermeter requirements, and
@@ -119,8 +127,8 @@ compass = HMC5883L(0x1e)
 bmp = BMP085(0x77)
 
 #assume quad start at level
-i_pitch = 0
-i_roll = 0
+#i_pitch = 0
+#i_roll = 0
 i_yaw = 0
 
 #declare RC receiver values (1000-2000us)
@@ -180,8 +188,8 @@ while True:
     ax, ay, az = accel.read()
     gx, gy, gz = gyro.getDegPerSecAxes()
 
-    print("Ax: "+str(ax)+", Ay: "+str(ay)+", Az: "+str(az)) #debug
-    print("Gx: "+str(gx)+", Gy: "+str(gy)+", Gz: "+str(gz)) #debug
+    #print("Ax: "+str(ax)+", Ay: "+str(ay)+", Az: "+str(az)) #debug
+    #print("Gx: "+str(gx)+", Gy: "+str(gy)+", Gz: "+str(gz)) #debug
     
     epitch, eroll, eyaw = accel.getEulerAngles(ax, ay, az)
     
@@ -189,18 +197,18 @@ while True:
     eroll = todeg(eroll)
     eyaw = todeg(eyaw)
     
-    print("ex: "+str(epitch)+", ey: "+str(eroll)+", ez: "+str(eyaw)) #debug
+    #print("ex: "+str(epitch)+", ey: "+str(eroll)+", ez: "+str(eyaw)) #debug
     #mx, my, mz = compass.getAxes()
     
     #Calculate accurate data with complementary filter
-    i_pitch += gy * delta_time
-    i_roll += gx * delta_time
-    i_yaw += gz * delta_time
+    #i_pitch = round(i_pitch + (gy*delta_time),1)
+    #i_roll = round(i_roll + (gx*delta_time),1)
+    i_yaw = round(i_yaw + (gz*delta_time),1)
     
-    pitch = 0.9*i_pitch + 0.1*epitch
-    roll = 0.9*i_roll + 0.1*eroll
-    yaw = i_roll
-
+    pitch = round(epitch,1)
+    roll = round(eroll,1)
+    yaw = i_yaw
+    
     print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
 
     #Calculate PID stab and rate of each axis, 6 total
@@ -219,6 +227,11 @@ while True:
     motor2 = map(rcthr + rollout - pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
     motor3 = map(rcthr + rollout + pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
     motor4 = map(rcthr - rollout + pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
+    
+    motor1 = constrain(motor1, 40.0, 80.0)
+    motor2 = constrain(motor2, 40.0, 80.0)
+    motor3 = constrain(motor3, 40.0, 80.0)
+    motor4 = constrain(motor4, 40.0, 80.0)
 
     print("Front Left: "+str(motor1)) #debug
     print("Front Right: "+str(motor2)) #debug
@@ -231,7 +244,7 @@ while True:
     PWM.set_duty_cycle("P9_42", motor3)
     PWM.set_duty_cycle("P8_13", motor4)
 
-    time.sleep(1) #debug
+    time.sleep(0.1) #debug
   
   
 #Exit and shut down everything
