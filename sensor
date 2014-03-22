@@ -78,7 +78,7 @@ while True:
     eroll = todeg(eroll)
     eyaw = todeg(eyaw)
     
-    print("ex: "+str(epitch)+", ey: "+str(eroll)+", ez: "+str(eyaw)) #debug
+    print("epitch: "+str(epitch)+", eroll: "+str(eroll)+", eyaw: "+str(eyaw)) #debug
     
     #Calculate accurate data with complementary filter
     i_pitch += gy * delta_time
