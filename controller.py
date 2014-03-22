@@ -140,17 +140,17 @@ rcroll = 0.0
 #initialize PIDs (Pgain, Igain, Dgain)
 ps_pid = PID(4.5, 0, 0)
 rs_pid = PID(4.5, 0, 0)
-ys_pid = PID(10, 0, 0)
+ys_pid = PID(4.5, 0, 0)
 
 pr_pid = PID(0.7, 0, 0)
 rr_pid = PID(0.7, 0, 0)
-yr_pid = PID(2.7, 0, 0)
+yr_pid = PID(0.7, 0, 0)
 
 #initial motor values, 400Hz, 1us-2us, 40%-80%
-motor1 = 40.0    #Front Left (CW)    (-roll,-pitch,-yaw)
-motor2 = 40.0    #Front Right (CCW)  (+roll,-pitch,+yaw)
-motor3 = 40.0    #Back Right (CW)    (+roll,+pitch,-yaw)
-motor4 = 40.0    #Back Left (CCW)    (-roll,+pitch,+yaw)
+motor1 = 40.0    #Front Left (CW)    (+roll,-pitch,-yaw)
+motor2 = 40.0    #Front Right (CCW)  (-roll,-pitch,+yaw)
+motor3 = 40.0    #Back Right (CW)    (-roll,+pitch,-yaw)
+motor4 = 40.0    #Back Left (CCW)    (+roll,+pitch,+yaw)
 
 #initialize output pins
 PWM.start("P9_14", motor1, 400, 0)
@@ -209,7 +209,7 @@ while True:
     roll = round(eroll,1)
     yaw = i_yaw
     
-    print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
+    #print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
 
     #Calculate PID stab and rate of each axis, 6 total
     pitchstab = ps_pid.Compute(pitch, rcpitch)
@@ -220,23 +220,23 @@ while True:
     rollout = rr_pid.Compute(gy, rollstab)
     yawout = yr_pid.Compute(gz, yawstab)
 
-    print("pitchout: "+str(pitchout)+", rollout: "+str(rollout)+", yawout: "+str(yawout)) #debug
+    #print("pitchout: "+str(pitchout)+", rollout: "+str(rollout)+", yawout: "+str(yawout)) #debug
 
     #Combine user input values and PID outputs to obtain individual motor speed
-    motor1 = map(rcthr - rollout - pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
-    motor2 = map(rcthr + rollout - pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
-    motor3 = map(rcthr + rollout + pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
-    motor4 = map(rcthr - rollout + pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor1 = map(rcthr + rollout - pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor2 = map(rcthr - rollout - pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor3 = map(rcthr - rollout + pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
+    motor4 = map(rcthr + rollout + pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
     
     motor1 = constrain(motor1, 40.0, 80.0)
     motor2 = constrain(motor2, 40.0, 80.0)
     motor3 = constrain(motor3, 40.0, 80.0)
     motor4 = constrain(motor4, 40.0, 80.0)
 
-    print("Front Left: "+str(motor1)) #debug
-    print("Front Right: "+str(motor2)) #debug
-    print("Back Right: "+str(motor3)) #debug
-    print("Back Left: "+str(motor4)) #debug    
+    #print("Front Left: "+str(motor1)) #debug
+    #print("Front Right: "+str(motor2)) #debug
+    #print("Back Right: "+str(motor3)) #debug
+    #print("Back Left: "+str(motor4)) #debug    
 
     #Update each motor with new speed
     PWM.set_duty_cycle("P9_14", motor1)
@@ -244,7 +244,7 @@ while True:
     PWM.set_duty_cycle("P9_42", motor3)
     PWM.set_duty_cycle("P8_13", motor4)
 
-    time.sleep(0.1) #debug
+    #time.sleep(0.1) #debug
   
   
 #Exit and shut down everything
