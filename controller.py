@@ -27,10 +27,10 @@ import shutil
 import ctypes
 from ctypes.util import find_library
 
-def map (x, in_min, in_max, out_min, out_max)
+def map(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
     
-def todeg (x)
+def todeg(x):
     return x*(180/math.pi)
 
 ############################################################################################
@@ -165,18 +165,23 @@ while True:
     elapsed_time = current_time - start_time
 
     #read RC receiver values from PRU
-    rcthr = 0.0
-    rcpitch = 0.0
-    rcroll = 0.0
-    rcyaw = 0.0
+    rcthr = 1400.0
+    rcpitch = 1500.0
+    rcroll = 1500.0
+    rcyaw = 1500.0
 
     rcpitch = map(rcpitch, 1000, 2000, -45, 45)
     rcroll = map(rcroll, 1000, 2000, -45, 45)
     rcyaw = map(rcyaw, 1000, 2000, -180, 180)
     
+    #print("rcpitch: "+str(rcpitch)+", rcroll: "+str(rcroll)+", rcyaw: "+str(rcyaw)) #debug
+    
     #Read Gyro and Accelerometer Data
     ax, ay, az = accel.read()
     gx, gy, gz = gyro.getDegPerSecAxes()
+
+    print("Ax: "+str(ax)+", Ay: "+str(ay)+", Az: "+str(az)) #debug
+    print("Gx: "+str(gx)+", Gy: "+str(gy)+", Gz: "+str(gz)) #debug
     
     epitch, eroll, eyaw = accel.getEulerAngles(ax, ay, az)
     
@@ -184,7 +189,8 @@ while True:
     eroll = todeg(eroll)
     eyaw = todeg(eyaw)
     
-    mx, my, mz = compass.getAxes()
+    print("ex: "+str(epitch)+", ey: "+str(eroll)+", ez: "+str(eyaw)) #debug
+    #mx, my, mz = compass.getAxes()
     
     #Calculate accurate data with complementary filter
     i_pitch += gy * delta_time
@@ -193,7 +199,9 @@ while True:
     
     pitch = 0.9*i_pitch + 0.1*epitch
     roll = 0.9*i_roll + 0.1*eroll
-    yaw = 0.9*i_roll + 0.1*mz
+    yaw = i_roll
+
+    print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
 
     #Calculate PID stab and rate of each axis, 6 total
     pitchstab = ps_pid.Compute(pitch, rcpitch)
@@ -204,17 +212,26 @@ while True:
     rollout = rr_pid.Compute(gy, rollstab)
     yawout = yr_pid.Compute(gz, yawstab)
 
+    print("pitchout: "+str(pitchout)+", rollout: "+str(rollout)+", yawout: "+str(yawout)) #debug
+
     #Combine user input values and PID outputs to obtain individual motor speed
     motor1 = map(rcthr - rollout - pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
     motor2 = map(rcthr + rollout - pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
     motor3 = map(rcthr + rollout + pitchout - yawout, 1000.0, 2000.0, 40.0, 80.0)
     motor4 = map(rcthr - rollout + pitchout + yawout, 1000.0, 2000.0, 40.0, 80.0)
-    
+
+    print("Front Left: "+str(motor1)) #debug
+    print("Front Right: "+str(motor2)) #debug
+    print("Back Right: "+str(motor3)) #debug
+    print("Back Left: "+str(motor4)) #debug    
+
     #Update each motor with new speed
     PWM.set_duty_cycle("P9_14", motor1)
     PWM.set_duty_cycle("P9_21", motor2)
     PWM.set_duty_cycle("P9_42", motor3)
     PWM.set_duty_cycle("P8_13", motor4)
+
+    time.sleep(1) #debug
   
   
 #Exit and shut down everything
@@ -223,8 +240,3 @@ PWM.stop("P8_13")
 PWM.stop("P9_21")
 PWM.stop("P9_42")
 PWM.cleanup()
-
-
-
-
-
