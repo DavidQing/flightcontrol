@@ -87,7 +87,7 @@ while True:
     
     pitch = 0.9*i_pitch + 0.1*epitch
     roll = 0.9*i_roll + 0.1*eroll
-    yaw = i_roll
+    yaw = i_yaw
 
     print("pitch: "+str(pitch)+", roll: "+str(roll)+", yaw: "+str(yaw)) #debug
 
